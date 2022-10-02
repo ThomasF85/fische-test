@@ -1,7 +1,10 @@
 import { useRouter } from "next/router";
+import { unstable_getServerSession } from "next-auth/next";
+import { authOptions } from "../../api/auth/[...nextauth]";
 import ProductForm from "../../../components/ProductForm";
 import { getAllCategories } from "../../../services/categoryService";
 import { getProductById } from "../../../services/productService";
+import { useSession } from "next-auth/react";
 
 export async function getServerSideProps(context) {
   const { id } = context.params;
@@ -9,12 +12,21 @@ export async function getServerSideProps(context) {
   const categories = await getAllCategories();
 
   return {
-    props: { product, categories },
+    props: {
+      product,
+      categories,
+      session: await unstable_getServerSession(
+        context.req,
+        context.res,
+        authOptions
+      ),
+    },
   };
 }
 
 export default function Product({ product, categories }) {
   const router = useRouter();
+  const { data: session } = useSession();
 
   async function handleSubmit(data) {
     const response = await fetch(`/api/products/${product.id}`, {
@@ -26,15 +38,19 @@ export default function Product({ product, categories }) {
     router.push(`/products/${product.id}`);
   }
 
-  return (
-    <>
-      <h1>Produkt bearbeiten</h1>
-      <ProductForm
-        onSubmit={handleSubmit}
-        categories={categories}
-        product={product}
-        buttonLabel="bearbeiten"
-      />
-    </>
-  );
+  if (session) {
+    return (
+      <>
+        <h1>Produkt bearbeiten</h1>
+        <ProductForm
+          onSubmit={handleSubmit}
+          categories={categories}
+          product={product}
+          buttonLabel="bearbeiten"
+        />
+      </>
+    );
+  }
+
+  return <p>Access Denied</p>;
 }

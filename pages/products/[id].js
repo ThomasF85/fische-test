@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 import styled from "styled-components";
 import Anchor from "../../components/Anchor";
 import Button from "../../components/Button";
@@ -17,6 +18,7 @@ export async function getServerSideProps(context) {
 
 export default function Product({ id, name, description, price, category }) {
   const router = useRouter();
+  const { status } = useSession();
 
   async function handleDelete() {
     const response = await fetch(`/api/products/${id}`, {
@@ -49,15 +51,17 @@ export default function Product({ id, name, description, price, category }) {
       <Link href={`/products`} passHref>
         <Anchor>Alle Produkte</Anchor>
       </Link>
-      <Section>
-        <h2>Admin Optionen</h2>
-        <Link href={`/products/${id}/update`} passHref>
-          <Anchor>Produkt bearbeiten</Anchor>
-        </Link>
-        <Button type="button" onClick={handleDelete}>
-          Produkt löschen
-        </Button>
-      </Section>
+      {status === "authenticated" && (
+        <Section>
+          <h2>Admin Optionen</h2>
+          <Link href={`/products/${id}/update`} passHref>
+            <Anchor>Produkt bearbeiten</Anchor>
+          </Link>
+          <Button type="button" onClick={handleDelete}>
+            Produkt löschen
+          </Button>
+        </Section>
+      )}
     </>
   );
 }
