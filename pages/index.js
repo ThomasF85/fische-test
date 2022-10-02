@@ -1,8 +1,12 @@
 import Head from "next/head";
 import Image from "next/image";
 import styled from "styled-components";
+import { useSession, signIn, signOut } from "next-auth/react";
+import Button from "../components/Button";
 
 export default function Home() {
+  const { data: session } = useSession();
+
   return (
     <>
       <Head>
@@ -18,7 +22,17 @@ export default function Home() {
         />
       </Background>
       <h1>Your Fish Shop</h1>
-      <p>Login to Fish shop</p>
+      {session ? (
+        <>
+          <p>Signed in as {session.user.email}</p>
+          <Button onClick={() => signOut()}>Sign out</Button>
+        </>
+      ) : (
+        <>
+          <p>Not signed in</p>
+          <Button onClick={() => signIn()}>Sign in</Button>
+        </>
+      )}
     </>
   );
 }
