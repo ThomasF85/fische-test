@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { TbFish } from "react-icons/tb";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Anchor from "./Anchor";
 
 export default function Header() {
   const { pathname } = useRouter();
@@ -27,16 +28,6 @@ export default function Header() {
 const FishIcon = styled(TbFish)`
   @media (max-width: 600px) {
     display: none;
-  }
-`;
-
-const Anchor = styled.a`
-  color: var(--text-secondary);
-  text-decoration: ${({ active }) => (active ? "underline" : "none")};
-
-  &:hover {
-    cursor: pointer;
-    color: var(--text-primary);
   }
 `;
 
