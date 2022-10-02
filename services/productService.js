@@ -60,3 +60,7 @@ const products = [
 export async function getAllProducts() {
   return products;
 }
+
+export async function getProductById(id) {
+  return products.find((product) => product.id === id);
+}
