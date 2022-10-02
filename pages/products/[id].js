@@ -1,7 +1,9 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import styled from "styled-components";
 import Anchor from "../../components/Anchor";
+import Button from "../../components/Button";
 import { getProductById } from "../../services/productService";
 
 export async function getServerSideProps(context) {
@@ -13,7 +15,17 @@ export async function getServerSideProps(context) {
   };
 }
 
-export default function Product({ name, description, price, category }) {
+export default function Product({ id, name, description, price, category }) {
+  const router = useRouter();
+
+  async function handleDelete() {
+    const response = await fetch(`/api/products/${id}`, {
+      method: "DELETE",
+    });
+    await response.json();
+    router.push("/products");
+  }
+
   return (
     <>
       <Head>
@@ -37,9 +49,29 @@ export default function Product({ name, description, price, category }) {
       <Link href={`/products`} passHref>
         <Anchor>Alle Produkte</Anchor>
       </Link>
+      <Section>
+        <h2>Admin Optionen</h2>
+        <Link href={`/products/${id}/update`} passHref>
+          <Anchor>Produkt bearbeiten</Anchor>
+        </Link>
+        <Button type="button" onClick={handleDelete}>
+          Produkt löschen
+        </Button>
+      </Section>
     </>
   );
 }
+
+const Section = styled.section`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid var(--text-primary);
+  width: 20rem;
+`;
 
 const Price = styled.p`
   font-size: 1.5rem;
